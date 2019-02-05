@@ -3,13 +3,13 @@
 
 using namespace std;
 
-AhrSimCore::AhrSimCore(state_reward_report_cb_type report_cb) :
+AhrSimCore::AhrSimCore(Strategy* robot_strategy) :
 	AhrSimApplication(),
-	robot_command_(ROBOT_STANDBY),	
+	m_robot_command(ROBOT_STANDBY),	
 	m_bApplyForce(false),
-	change_robot_vel_(false),
-	is_sim_initialized_(false),
-	report_cb_(report_cb)
+	m_change_robot_vel(false),
+	m_is_sim_initialized(false),
+	m_robot_strategy(robot_strategy)
 {}
 
 void AhrSimCore::InitializePhysics() 
@@ -79,10 +79,10 @@ void AhrSimCore::CreateObjects() {
 	m_b4->GetRigidBody()->setLinearFactor(btVector3(0,0,0));	
 	m_b4->GetRigidBody()->setAngularFactor(btVector3(0,0,0));
 	
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_b1->GetRigidBody())] = "b1";
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_b2->GetRigidBody())] = "b2";
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_b3->GetRigidBody())] = "b3";
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_b4->GetRigidBody())] = "b4";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_b1->GetRigidBody())] = "b1";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_b2->GetRigidBody())] = "b2";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_b3->GetRigidBody())] = "b3";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_b4->GetRigidBody())] = "b4";
 
 
 	// create a green cylinder	
@@ -104,89 +104,81 @@ void AhrSimCore::CreateObjects() {
 	m_pack->GetRigidBody()->setLinearFactor(btVector3(1,0,1));	
 	m_pack->GetRigidBody()->setAngularFactor(btVector3(1,0,1));	
 	
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_pack->GetRigidBody())] = "pack";
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(m_robot->GetRigidBody())] = "robot";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_pack->GetRigidBody())] = "pack";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_robot->GetRigidBody())] = "robot";
 	
 	
 	//make make gtriger gates
-	robot_gate_ = create_trigger_gate(
+	m_robot_gate = create_trigger_gate(
 		btVector3(1,11,11),//shape 
 		btVector3(48,1,0));		
-	m_pWorld->addCollisionObject(robot_gate_);//pos
+	m_pWorld->addCollisionObject(m_robot_gate);//pos
 			
 	//make make gtriger gates
-	pack_gate_ = create_trigger_gate(
+	m_pack_gate = create_trigger_gate(
 		btVector3(1,11,11),//shape 
 		btVector3(-48,1,0));		
-	m_pWorld->addCollisionObject(pack_gate_);//pos
+	m_pWorld->addCollisionObject(m_pack_gate);//pos
 	
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(robot_gate_)] = "robot_gate";
-	rigid_objects_[reinterpret_cast<boost::uint64_t>(pack_gate_)] =  "pack_gate";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_robot_gate)] = "robot_gate";
+	m_rigid_objects[reinterpret_cast<boost::uint64_t>(m_pack_gate)] =  "pack_gate";
 	
-	is_sim_initialized_ = true;
+	m_is_sim_initialized = true;
 }
 
 void AhrSimCore::CollisionEvent(btRigidBody* pBody0, btRigidBody* pBody1) 
 {	
-	if (is_sim_initialized_)
+	if (m_is_sim_initialized)
 	{
-		RigidBodyType::iterator it1 = rigid_objects_.find(reinterpret_cast<boost::uint64_t>(pBody0)); 
-		RigidBodyType::iterator it2 = rigid_objects_.find(reinterpret_cast<boost::uint64_t>(pBody1)); 
+		RigidBodyType::iterator it1 = m_rigid_objects.find(reinterpret_cast<boost::uint64_t>(pBody0)); 
+		RigidBodyType::iterator it2 = m_rigid_objects.find(reinterpret_cast<boost::uint64_t>(pBody1)); 
 		
-		if (it1 != rigid_objects_.end()) m_col_obj1 = (std::string)(it1->second);	
-		if (it2 != rigid_objects_.end()) m_col_obj1 = (std::string)(it2->second);		
+		if (it1 != m_rigid_objects.end()) m_col_obj1 = (std::string)(it1->second);	
+		if (it2 != m_rigid_objects.end()) m_col_obj1 = (std::string)(it2->second);		
 	}
-}
-
-void AhrSimCore::robot_dir_command(ROBOT_DIRECTION direction)
-{
-	m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-	robot_command_ = direction;
-	change_robot_vel_= true;	
 }
 
 
 void AhrSimCore::Keyboard(unsigned char key, int x, int y) 
 {
 	// call the base implementation first
-	AhrSimApplication::Keyboard(key, x, y);
+	AhrSimApplication::Keyboard(key, x, y);	
 	
-	cout << "Pressed key: " << key << endl;
 	switch(key) 
 	{	
 		case 'h':
 		{			
 			m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			robot_command_ = ROBOT_LEFT;
-			change_robot_vel_= true;
+			m_robot_command = ROBOT_LEFT;
+			m_change_robot_vel = true;
 			break;
 		}
 		case 'j':
 		{		
 			m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			robot_command_ = ROBOT_RIGHT;
-			change_robot_vel_= true;
+			m_robot_command = ROBOT_RIGHT;
+			m_change_robot_vel= true;
 			break;
 		}
 		case 'u':
 		{		
 			m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			robot_command_ = ROBOT_FORWARD;
-			change_robot_vel_= true;
+			m_robot_command = ROBOT_FORWARD;
+			m_change_robot_vel= true;
 			break;
 		}
 		case 'n':
 		{		
 			m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			robot_command_ = ROBOT_BACK;
-			change_robot_vel_= true;
+			m_robot_command = ROBOT_BACK;
+			m_change_robot_vel = true;
 			break;
 		}		
 		case 's':
 		{		
 			m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
-			robot_command_ = ROBOT_STANDBY;			
-			change_robot_vel_= true;
+			m_robot_command = ROBOT_STANDBY;			
+			m_change_robot_vel = true;
 			break;
 		}
 		case 'f':
@@ -209,33 +201,33 @@ void AhrSimCore::UpdateScene(float dt) {
 	int left_right = 0;
 	int back_forward = 0;	
 
-	if (change_robot_vel_== true)
+	if (m_change_robot_vel == true)
 	{
 		// Force testing
-		if (robot_command_ & ROBOT_LEFT)
+		if (m_robot_command & ROBOT_LEFT)
 		{	
 			left_right = 80;
 		}
-		else if (robot_command_ & ROBOT_RIGHT)
+		else if (m_robot_command & ROBOT_RIGHT)
 		{		
 			left_right = -80;						
 		}		
 		
-		if(robot_command_ & ROBOT_BACK)
+		if(m_robot_command & ROBOT_BACK)
 		{	
 			back_forward = 80;						
 		}
-		else if(robot_command_ & ROBOT_FORWARD)
+		else if(m_robot_command & ROBOT_FORWARD)
 		{
 			back_forward = -80;			
 		}		
 		
-		if(robot_command_ & ROBOT_STANDBY)
+		if(m_robot_command & ROBOT_STANDBY)
 		{	
 			back_forward = left_right = 0;
 		}		
-		change_robot_vel_= false;		
-		robot_command_ = ROBOT_STANDBY;		
+		m_change_robot_vel = false;		
+		m_robot_command = ROBOT_STANDBY;		
 	}
 	
 	if (m_bApplyForce)
@@ -255,7 +247,7 @@ void AhrSimCore::UpdateScene(float dt) {
 	m_b4->GetRigidBody()->forceActivationState(ACTIVE_TAG); 	
 	 
 		 
-	if (report_cb_)
+	if (m_robot_strategy)
 	{
 		btTransform trans_pack;
 		m_pack->GetRigidBody()->getMotionState()->getWorldTransform(trans_pack);
@@ -279,9 +271,9 @@ void AhrSimCore::UpdateScene(float dt) {
 			//take the first collision object
 			const btCollisionObject* collision_object = RayCallback.m_collisionObjects[0];			
 			
-			RigidBodyType::iterator it = rigid_objects_.find(reinterpret_cast<boost::uint64_t>(collision_object)); 		
+			RigidBodyType::iterator it = m_rigid_objects.find(reinterpret_cast<boost::uint64_t>(collision_object)); 		
 			
-			if (it != rigid_objects_.end())
+			if (it != m_rigid_objects.end())
 			{			
 				std::string col_raycast = (std::string)(it->second);
 				
@@ -295,14 +287,15 @@ void AhrSimCore::UpdateScene(float dt) {
 		}
 		
 		
-		report_cb_(CState(
-				trans_pack.getOrigin().getX(), trans_pack.getOrigin().getZ(), v_pack[0], v_pack[2],
+		State state = State(trans_pack.getOrigin().getX(), trans_pack.getOrigin().getZ(), v_pack[0], v_pack[2],
 				trans_robot.getOrigin().getX(), trans_robot.getOrigin().getZ(), v_robot[0], v_robot[2],
-				m_col_obj1, m_col_obj1));		
-		
+				m_col_obj1, m_col_obj1);	
+				
+		m_robot->GetRigidBody()->setActivationState(DISABLE_DEACTIVATION);
+		m_robot_command = m_robot_strategy->simulator_state(state);			
+		m_change_robot_vel = true;		
 		m_col_obj1 = "no_object";
-		m_col_obj1 = "no_object";
-	}		
-	
+		m_col_obj1 = "no_object";				
+	}
 }
 

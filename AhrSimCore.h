@@ -6,47 +6,32 @@
 #include <boost/cstdint.hpp>
 #include <boost/unordered_map.hpp>
 #include <string>
-#include "CState.h"
+#include "State.h"
+#include "Strategy.h"
 #include <functional>
 
 
 typedef boost::unordered_map<boost::uint64_t, std::string> RigidBodyType;
 
-typedef std::function<void(CState)> state_reward_report_cb_type;
-
-//Implemets core AHR simulator logic,
-//Handles simulate physical world forces
+//Implements core AHR simulator logic,
+//Handles physical world forces simulation
 //by interacting with Bullet engine
-//Plays game 
+//Plays air hockey game according to a robot strategy
 class AhrSimCore : public AhrSimApplication 
 {
 public:
-	AhrSimCore(state_reward_report_cb_type=nullptr);
+	AhrSimCore(Strategy* robot_strategy);
 
 	virtual void InitializePhysics() override;
 	virtual void ShutdownPhysics() override;
 
 	void CreateObjects();
 
+	//Override strategy robot command, just for debug!
 	virtual void Keyboard(unsigned char key, int x, int y) override;
 	virtual void KeyboardUp(unsigned char key, int x, int y) override;
 	virtual void UpdateScene(float dt);
-
-	virtual void CollisionEvent(btRigidBody* pBody0, btRigidBody* pBody1) override;
-
-	//AHR gane robot commands
-	enum ROBOT_DIRECTION
-	{
-		NO_COMMAND    = 0,
-		ROBOT_STANDBY = 1,
-		ROBOT_LEFT    = 2,
-		ROBOT_RIGHT   = 4,
-		ROBOT_BACK    = 8,
-		ROBOT_FORWARD = 16
-	};
-
-	//Set robot command interface
-	void robot_dir_command(ROBOT_DIRECTION direction);
+	virtual void CollisionEvent(btRigidBody* pBody0, btRigidBody* pBody1) override;	
 
 protected:	
 	GameObject* m_robot; //AHR robot
@@ -58,26 +43,26 @@ protected:
 	GameObject* m_b3;
 	GameObject* m_b4;
 	
-	RigidBodyType rigid_objects_;
+	RigidBodyType m_rigid_objects;
 	
 	std::string m_col_obj1 = "no_object"; //name of the first collided object
 	std::string m_col_obj2 = "no_object"; //name of the second collided object
 	
-	boost::uint64_t robot_command_;	
+	boost::uint64_t m_robot_command;	
 
 	// a simple trigger volume
-	btCollisionObject* pack_gate_; //adversarial gate
+	btCollisionObject* m_pack_gate; //adversarial gate
 	
-	btCollisionObject* robot_gate_;	//robot gate
+	btCollisionObject* m_robot_gate;	//robot gate
 
 	// keeps track of whether we're holding down the 'g' key
 	bool m_bApplyForce;
 	
-	bool change_robot_vel_;
+	bool m_change_robot_vel;
 	
-	bool is_sim_initialized_;
+	bool m_is_sim_initialized;
 	
-	state_reward_report_cb_type report_cb_;
+	Strategy* m_robot_strategy = 0;
 };
 
 #endif
