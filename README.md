@@ -23,15 +23,15 @@ The technology that has been chosen is Bullet Physics SDK for real world forces 
 
 #
 This repository contains a basic code for the air hockey game robot simulation.
-Main point for strategy is abstract Strategy.cpp class.
-This demo contains game playing by robot against manual adversarial managed by ToyStrategy 
-class implementing very a simply strategy -https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
+Main point for strategy is abstract Strategy class.
+The following demo contains example of game playing by the air hockey robot driven by ToyStrategy 
+class implementing a simply strategy -https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
 
 #
 Next step is to start training advanced strategies by RF algorithms and the simulator.
 #
 
 ### Requirements for AhrSimulator
-I developted the simulator on Ubunutu 16.04, C++, Bullet ver 2.87,
+The simulator was developed and tested on Ubunutu 16.04 with C++, Bullet ver 2.87,
 nvidia-396 OpenGL driver and Glut library.
 
