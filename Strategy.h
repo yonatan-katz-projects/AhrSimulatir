@@ -7,7 +7,7 @@
 class AhrSimCore;
 
 //AHR game robot commands
-//multiple simultaneously commands are accepted by a simulator
+//multiple simultaneous commands are accepted by a simulator
 enum ROBOT_DIRECTION
 {
 	NO_COMMAND    = 0,
@@ -35,7 +35,7 @@ class ToyStrategy: public Strategy
 public:
 	ToyStrategy();			
 	~ToyStrategy();			
-	//provide strategy with simulator new state
+	//provide a strategy with new simulator state
 	virtual int simulator_state(const State& state);	
 };
 #endif
