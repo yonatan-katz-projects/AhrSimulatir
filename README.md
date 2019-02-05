@@ -29,4 +29,9 @@ class implementing very a simply strategy -https://drive.google.com/open?id=1aRo
 
 #
 Next step is to start training advanced strategies by RF algorithms and the simulator.
+#
+
+### Requirements for AhrSimulator
+I developted the simulator on Ubunutu 16.04, C++, Bullet ver 2.87,
+nvidia-396 OpenGL driver and Glut library.
 
