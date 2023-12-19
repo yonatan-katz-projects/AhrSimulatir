@@ -26,7 +26,7 @@ The technology that has been chosen is Bullet Physics SDK (https://github.com/bu
 for real world forces simulation and OpenGL for visualization. 
 
 #
-Main point for strategy is abstract Strategy class. All RL plolciy must be inherited from this class.
+Main point for strategy is abstract Strategy class. All RL policies must be inherited from this class.
 In order to show how air hockey simulator works I implemented simply policy ToyStrategy that plays the game:
 https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
 
