@@ -1,34 +1,37 @@
 ### AhrSimulator
 Air hockey robot simulator is a project that has been inspired by an idea to educate my older son
-to create interesting robot projects. He is 12 year old and I was looking for some fun project that 
+to create interesting robot projects. He is 12 year old and I was looking for a fun project that 
 combines robotics and software development.
 
- After a few projects discovered I decided to stick with open source air hockey robot project - https://github.com/JJulio/AHRobot.	
-They provided a brilliant instructions how to replicate their air hockey robot.
-
-Robot parts were printed by 3D and all other stuff was found in the nearest store. 
-So a few days latter we managed to assemble the robot and replicate the game construction. 
+After examination a number of projects I decided to stick with open source air hockey robot project - https://github.com/JJulio/AHRobot.	
+This project provideds a brilliant instructions how to build air hockey robot.
+Robot's parts were printed by 3D pronter and all other stuff was found in the nearest store. 
+So a few days latter my son and me have managed to assemble the robot and replicate the game construction. 
 The project uses web camera and simple openCV tracking algorithm in order to steer the robot. 
 They also provide all required software to start playing the game.
 So we are really excited by playing the game: https://drive.google.com/open?id=1Jig2CLq_RQDYSkCrVZRSssE4OTvT7oh2
 
-
-However performance of the robot was a bit disappointing.  
-Even my younger son who is 6 year old is able to win the game easily. 
+However performance of the robot was disappointing.  
+Even my younger son who is 6 year old was able to win the game easily. 
 So I decided to take the project to the next stage and significantly improve the robot performance.
-My idea is to use reinforce learning algorithms in order to train the robot best strategy. 
-In order to apply RF algorithms I need appropriate simulator. 
-After short research I did not find appropriate simulator and decided to develop my one.
-The technology that has been chosen is Bullet Physics SDK for real world forces simulation and OpenGL for visualization. 
+My idea was to use reinforce learning algorithm in order to train the robot play game and eventually create a stronger game starategy. 
+
+Reinforcement learning (RL) is a subfield of machine learning that involves training an agent to make a series of decisions in an environment in order to maximize a reward.
+The goal of RL is to learn a policy that maps states to actions in a way that maximizes the expected cumulative reward over time.
+
+In order to train RL algorithm I needed a robot simulator because training involves a playing a big number of games in order to find the best policy.
+After a research I did not find appropriate simulator for air hockey robot and I decided to develop my own simulator.
+This repository contains my implementation of the air hockey robot simulator for training RL algorightms.
+The technology that has been chosen is Bullet Physics SDK (https://github.com/bulletphysics/bullet3)
+for real world forces simulation and OpenGL for visualization. 
 
 #
-This repository contains a basic code for the air hockey game robot simulation.
-Main point for strategy is abstract Strategy class.
-The following demo contains example of game playing by the air hockey robot driven by ToyStrategy 
-class implementing a simply strategy -https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
+Main point for strategy is abstract Strategy class. All RL plolciy must be inherited from this class.
+In order to show how air hockey simulator works I implemented simply policy ToyStrategy that plays the game:
+https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
 
 #
-Next step is to start training advanced strategies by RF algorithms and the simulator.
+Next step is to start training advanced strategies by RL algorithm and the simulator.
 #
 
 ### Requirements for AhrSimulator
