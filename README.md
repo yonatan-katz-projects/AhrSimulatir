@@ -32,6 +32,7 @@ https://drive.google.com/open?id=1aRo8Zmy9rUqJ-_tABO-29AAIfiIhBQo2
 
 #
 Next step is to start training advanced strategies by RL algorithm and the simulator.
+TODO: define reward function for the next step policy
 #
 
 ### Requirements for AhrSimulator
